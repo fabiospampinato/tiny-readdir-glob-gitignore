@@ -1,0 +1,38 @@
+{
+  "name": "tiny-readdir-glob-gitignore",
+  "repository": "github:fabiospampinato/tiny-readdir-glob-gitignore",
+  "description": "A simple promisified recursive readdir function, with support for globs and .gitignore files.",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "clean": "tsex clean",
+    "compile": "tsex compile",
+    "compile:watch": "tsex compile --watch",
+    "test": "tsex test",
+    "test:watch": "tsex test --watch",
+    "prepublishOnly": "tsex prepare"
+  },
+  "keywords": [
+    "readdir",
+    "recursive",
+    "promise",
+    "simple",
+    "tiny",
+    "glob",
+    "gitignore"
+  ],
+  "dependencies": {
+    "fast-ignore": "^1.1.1",
+    "find-up-path": "^1.0.0",
+    "tiny-readdir-glob": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.29",
+    "fava": "^0.3.2",
+    "tsex": "^3.2.1",
+    "typescript": "^5.4.2"
+  }
+}
