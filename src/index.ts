@@ -3,6 +3,7 @@
 
 import findUpPath from 'find-up-path';
 import path from 'node:path';
+import process from 'node:process';
 import readdirGlob from 'tiny-readdir-glob';
 import {castArray, getIgnoreAt} from './utils';
 import type {Dirent, Ignore, Options, Result} from './types';
@@ -18,8 +19,9 @@ const readdirGlobGitignore = async ( glob: string | string[], options?: Options 
   const ignores: Ignore[] = [];
 
   if ( ignoreFilesFindAbove ) {
+    const parentPath = path.dirname ( options?.cwd ?? process.cwd () );
     for ( const ignoreFile of ignoreFiles ) {
-      const filePath = findUpPath ( ignoreFile );
+      const filePath = findUpPath ( ignoreFile, parentPath );
       if ( !filePath ) continue;
       const folderPath = path.dirname ( filePath );
       const ignore = await getIgnoreAt ( folderPath, [ignoreFile] );
