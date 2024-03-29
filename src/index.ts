@@ -5,7 +5,7 @@ import findUpPath from 'find-up-path';
 import path from 'node:path';
 import process from 'node:process';
 import readdirGlob from 'tiny-readdir-glob';
-import {castArray, getIgnoreAt} from './utils';
+import {castArray, getIgnoreAt, getSkippedPaths} from './utils';
 import type {Dirent, Ignore, Options, Result} from './types';
 
 /* MAIN */
@@ -14,17 +14,29 @@ import type {Dirent, Ignore, Options, Result} from './types';
 
 const readdirGlobGitignore = async ( glob: string | string[], options?: Options ): Promise<Result> => {
 
+  const rootPath = options?.cwd ?? process.cwd ();
+
   const ignoreFiles = options?.ignoreFiles ?? ['.gitignore'];
   const ignoreFilesFindAbove = options?.ignoreFilesFindAbove ?? true;
   const ignores: Ignore[] = [];
 
-  if ( ignoreFilesFindAbove ) {
-    const parentPath = path.dirname ( options?.cwd ?? process.cwd () );
+  if ( ignoreFilesFindAbove && ignoreFiles.length ) {
+    const parentPath = path.dirname ( rootPath );
     for ( const ignoreFile of ignoreFiles ) {
       const filePath = findUpPath ( ignoreFile, parentPath );
       if ( !filePath ) continue;
       const folderPath = path.dirname ( filePath );
       const ignore = await getIgnoreAt ( folderPath, [ignoreFile] );
+      if ( !ignore ) continue;
+      ignores.push ( ignore );
+    }
+  }
+
+  if ( ignoreFiles.length ) {
+    const skippedPaths = getSkippedPaths ( rootPath, glob );
+    for ( const skippedPath of skippedPaths ) {
+      const ignore = await getIgnoreAt ( skippedPath, ignoreFiles );
+      if ( !ignore ) continue;
       ignores.push ( ignore );
     }
   }
@@ -43,6 +55,7 @@ const readdirGlobGitignore = async ( glob: string | string[], options?: Options 
       const folderPath = ignoreDirents[0].path;
       const filesNames = ignoreDirents.map ( dirent => dirent.name );
       const ignore = await getIgnoreAt ( folderPath, filesNames );
+      if ( !ignore ) return;
       ignores.push ( ignore );
     }
   });

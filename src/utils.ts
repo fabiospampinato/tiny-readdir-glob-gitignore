@@ -4,6 +4,7 @@
 import fastIgnore from 'fast-ignore';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {explodeStart} from 'zeptomatch-explode';
 import type {Ignore} from './types';
 
 /* MAIN */
@@ -28,13 +29,17 @@ const fastRelativeChildPath = ( fromPath: string, toPath: string ): string | und
 
 };
 
-const getIgnoreAt = async ( folderPath: string, filesNames: string[] ): Promise<Ignore> => {
+const getIgnoreAt = async ( folderPath: string, filesNames: string[] ): Promise<Ignore | undefined> => {
 
-  if ( !filesNames.length ) return () => false;
+  if ( !filesNames.length ) return;
 
   const filesPaths = filesNames.map ( fileName => path.join ( folderPath, fileName ) );
-  const filesContents = await Promise.all ( filesPaths.map ( filePath => fs.readFile ( filePath, 'utf8' ) ) );
-  const ignore = fastIgnore ( filesContents );
+  const filesContents = await Promise.all ( filesPaths.map ( filePath => fs.readFile ( filePath, 'utf8' ).catch ( () => '' ) ) );
+  const filesContentsValid = filesContents.filter ( Boolean );
+
+  if ( !filesContentsValid.length ) return;
+
+  const ignore = fastIgnore ( filesContentsValid );
 
   return ( targetPath: string ): boolean => {
 
@@ -46,6 +51,36 @@ const getIgnoreAt = async ( folderPath: string, filesNames: string[] ): Promise<
 
 };
 
+const getSkippedPaths = ( rootPath: string, globs: string | string[] ): string[] => {
+
+  const skippedPaths = new Set<string>();
+
+  for ( const glob of castArray ( globs ) ) {
+
+    const {statics} = explodeStart ( glob );
+
+    for ( const prefix of statics ) {
+
+      let skippedPath = path.join ( rootPath, path.dirname ( prefix ) );
+
+      while ( true ) {
+
+        skippedPaths.add ( skippedPath );
+
+        if ( skippedPath === rootPath ) break;
+
+        skippedPath = path.dirname ( skippedPath );
+
+      }
+
+    }
+
+  }
+
+  return [...skippedPaths];
+
+};
+
 /* EXPORT */
 
-export {castArray, fastRelativeChildPath, getIgnoreAt};
+export {castArray, fastRelativeChildPath, getIgnoreAt, getSkippedPaths};

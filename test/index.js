@@ -14,6 +14,7 @@ describe ( 'Tiny Readdir Glob Gitignore', it => {
   it ( 'works', async t => {
 
     const rootPath = process.cwd ();
+    const distPath = path.join ( rootPath, 'dist' );
     const modulesPath = path.join ( rootPath, 'node_modules' );
     const fooIgnorePath = path.join ( rootPath, '.fooignore' );
     const fooIgnoreContent = 'src';
@@ -50,7 +51,24 @@ describe ( 'Tiny Readdir Glob Gitignore', it => {
 
     fs.unlinkSync ( fooIgnorePath );
 
-    console.log ( result1.files );
+    const result7 = await readdir ( 'dist/**/*', {
+      cwd: rootPath
+    });
+
+    const result8 = await readdir ( 'dist/**/*', {
+      cwd: rootPath,
+      ignoreFilesFindAbove: false
+    });
+
+    const result9 = await readdir ( 'dist/**/*', {
+      cwd: rootPath,
+      ignoreFiles: ['.fooignore']
+    });
+
+    const result10 = await readdir ( '**/*', {
+      cwd: distPath,
+      ignoreFilesFindAbove: false
+    });
 
     t.true ( result1.files.length < 100 );
     t.is ( result2.files.length, 0 );
@@ -59,6 +77,11 @@ describe ( 'Tiny Readdir Glob Gitignore', it => {
     t.true ( result4.files.length > result3.files.length );
     t.true ( result5.files.length < result4.files.length );
     t.true ( result6.files.length < result1.files.length );
+
+    t.true ( result7.files.length === 0 );
+    t.true ( result8.files.length === 0 );
+    t.true ( result9.files.length > 0 );
+    t.true ( result10.files.length > 0 );
 
   });
 
