@@ -18,12 +18,14 @@ import readdir from 'tiny-readdir-glob-gitignore';
 const aborter = new AbortController ();
 
 const result = await readdir ( ['src/**/*.js'], {
+  cwd: process.cwd (), // The root directory to start searching from
   depth: 20, // Maximum depth to look at
   limit: 1_000_000, // Maximum number of files explored, useful as a stop gap in some edge cases
   followSymlinks: true, // Whether to follow symlinks or not
   ignore: ['**/.git', '**/node_modules'], // Globs, or raw function, that if returns true will ignore this particular file or a directory and its descendants
   ignoreFiles: ['.gitignore'], // List of .gitignore-like files to look for, defaults to ['.gitignore']
   ignoreFilesFindAbove: true, // Whether to look for .gitignore-like files in parent directories also, defaults to true
+  ignoreFilesFindBetween: true, // Whether to look for .gitignore-like files between the "cwd" directory, and the actual search directories, which due to some optimizations could not be the same
   signal: aborter.signal, // Optional abort signal, useful for aborting potentially expensive operations
   onDirents: dirents => console.log ( dirents ) // Optional callback that will be called as soon as new dirents are available, useful for example for discovering ".gitignore" files while searching
 });
