@@ -94,9 +94,17 @@ const getSearchPaths = ( rootPath: string, globs: string | string[] ): string[] 
 
     for ( const prefix of statics ) {
 
-      const searchPath = path.join ( rootPath, prefix );
+      let searchPath = path.join ( rootPath, prefix );
 
-      searchPaths.add ( searchPath );
+      while ( true ) {
+
+        searchPaths.add ( searchPath );
+
+        if ( searchPath === rootPath ) break;
+
+        searchPath = path.dirname ( searchPath );
+
+      }
 
     }
 

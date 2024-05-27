@@ -114,6 +114,16 @@ describe ( 'Tiny Readdir Glob Gitignore', it => {
     t.true ( files4.length > 0 );
     t.true ( files4.length > files1.length );
 
+    const {files: files5} = await readdir ( 'node_modules/tiny-readdir', {
+      ignoreFilesStrictly: false
+    });
+
+    t.true ( files5.length > 0 );
+
+    const {files: files6} = await readdir ( 'node_modules/tiny-readdir/dist', {
+      ignoreFilesStrictly: false
+    });
+
   });
 
 });
