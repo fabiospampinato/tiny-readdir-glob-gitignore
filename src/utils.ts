@@ -5,6 +5,8 @@ import fastIgnore from 'fast-ignore';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {explodeStart} from 'zeptomatch-explode';
+import isStatic from 'zeptomatch-is-static';
+import unescape from 'zeptomatch-unescape';
 import type {Ignore} from './types';
 
 /* MAIN */
@@ -24,6 +26,22 @@ const fastRelativeChildPath = ( fromPath: string, toPath: string ): string | und
       return toPath.slice ( fromPath.length + 1 );
 
     }
+
+  }
+
+};
+
+const globExplode = ( glob: string ): [paths: string[], glob: string] => {
+
+  if ( isStatic ( glob ) ) { // Handling it as a relative path, not a glob
+
+    return [[unescape ( glob )], '**/*'];
+
+  } else { // Handling it as an actual glob
+
+    const {statics, dynamic} = explodeStart ( glob );
+
+    return [statics, dynamic];
 
   }
 
@@ -57,7 +75,7 @@ const getSkippedPaths = ( rootPath: string, globs: string | string[] ): string[]
 
   for ( const glob of castArray ( globs ) ) {
 
-    const {statics} = explodeStart ( glob );
+    const [statics] = globExplode ( glob );
 
     for ( const prefix of statics ) {
 
