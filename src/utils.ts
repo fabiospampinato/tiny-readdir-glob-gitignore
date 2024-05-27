@@ -47,7 +47,7 @@ const globExplode = ( glob: string ): [paths: string[], glob: string] => {
 
 };
 
-const getIgnoreAt = async ( folderPath: string, filesNames: string[] ): Promise<Ignore | undefined> => {
+const getIgnoreAt = async ( folderPath: string, filesNames: string[], forcedPaths: string[] = [] ): Promise<Ignore | undefined> => {
 
   if ( !filesNames.length ) return;
 
@@ -57,7 +57,8 @@ const getIgnoreAt = async ( folderPath: string, filesNames: string[] ): Promise<
 
   if ( !filesContentsValid.length ) return;
 
-  const ignore = fastIgnore ( filesContentsValid );
+  const filesContentsWithForcedPaths = filesContentsValid.map ( content => getIgnoreContentWithForcedPaths ( folderPath, content, forcedPaths ) );
+  const ignore = fastIgnore ( filesContentsWithForcedPaths );
 
   return ( targetPath: string ): boolean => {
 
@@ -66,6 +67,42 @@ const getIgnoreAt = async ( folderPath: string, filesNames: string[] ): Promise<
     return !!relativePath && ignore ( relativePath );
 
   };
+
+};
+
+const getIgnoreContentWithForcedPaths = ( folderPath: string, content: string, forcedPaths: string[] ): string => {
+
+  if ( !forcedPaths.length ) return content;
+
+  const forcedRelativePathsInside = forcedPaths.map ( forcedPath => fastRelativeChildPath ( folderPath, forcedPath ) ).filter ( isString ).map ( unixify );
+
+  if ( !forcedRelativePathsInside.length ) return content;
+
+  const forcedContents = forcedRelativePathsInside.map ( forcedPath => `!/${forcedPath}` ).join ( '\n' );
+
+  return `${content}\n${forcedContents}`;
+
+};
+
+const getSearchPaths = ( rootPath: string, globs: string | string[] ): string[] => {
+
+  const searchPaths = new Set<string>();
+
+  for ( const glob of castArray ( globs ) ) {
+
+    const [statics] = globExplode ( glob );
+
+    for ( const prefix of statics ) {
+
+      const searchPath = path.join ( rootPath, prefix );
+
+      searchPaths.add ( searchPath );
+
+    }
+
+  }
+
+  return [...searchPaths];
 
 };
 
@@ -99,6 +136,18 @@ const getSkippedPaths = ( rootPath: string, globs: string | string[] ): string[]
 
 };
 
+const isString = ( value: unknown ): value is string => {
+
+  return typeof value === 'string';
+
+};
+
+const unixify = ( filePath: string ): string => {
+
+  return filePath.replace ( /[\\\/]+/g, '/' );
+
+};
+
 /* EXPORT */
 
-export {castArray, fastRelativeChildPath, getIgnoreAt, getSkippedPaths};
+export {castArray, fastRelativeChildPath, globExplode, getIgnoreAt, getIgnoreContentWithForcedPaths, getSearchPaths, getSkippedPaths, isString, unixify};

@@ -22,6 +22,7 @@ type Options = {
   ignoreFiles?: string[],
   ignoreFilesFindAbove?: boolean,
   ignoreFilesFindBetween?: boolean,
+  ignoreFilesStrictly?: boolean,
   signal?: { aborted: boolean },
   onDirents?: ( dirents: Dirent[] ) => PromiseMaybe<undefined>
 };

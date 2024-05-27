@@ -24,12 +24,14 @@ describe ( 'Tiny Readdir Glob Gitignore', it => {
     });
 
     const result2 = await readdir ( '**/*', {
-      cwd: modulesPath
+      cwd: modulesPath,
+      ignoreFilesStrictly: true
     });
 
     const result3 = await readdir ( '**/*', {
       cwd: modulesPath,
-      ignoreFilesFindAbove: false
+      ignoreFilesFindAbove: false,
+      ignoreFilesStrictly: true
     });
 
     const result4 = await readdir ( '**/*', {
@@ -52,22 +54,26 @@ describe ( 'Tiny Readdir Glob Gitignore', it => {
     fs.unlinkSync ( fooIgnorePath );
 
     const result7 = await readdir ( 'dist/**/*', {
-      cwd: rootPath
+      cwd: rootPath,
+      ignoreFilesStrictly: true
     });
 
     const result8 = await readdir ( 'dist/**/*', {
       cwd: rootPath,
-      ignoreFilesFindAbove: false
+      ignoreFilesFindAbove: false,
+      ignoreFilesStrictly: true
     });
 
     const result9 = await readdir ( 'dist/**/*', {
       cwd: rootPath,
-      ignoreFiles: ['.fooignore']
+      ignoreFiles: ['.fooignore'],
+      ignoreFilesStrictly: true
     });
 
     const result10 = await readdir ( '**/*', {
       cwd: distPath,
-      ignoreFilesFindAbove: false
+      ignoreFilesFindAbove: false,
+      ignoreFilesStrictly: true
     });
 
     t.true ( result1.files.length < 100 );
@@ -82,6 +88,31 @@ describe ( 'Tiny Readdir Glob Gitignore', it => {
     t.true ( result8.files.length === 0 );
     t.true ( result9.files.length > 0 );
     t.true ( result10.files.length > 0 );
+
+  });
+
+  it ( 'supports reincluding back explicitly searched into roots', async t => {
+
+    const {files: files1} = await readdir ( 'node_modules' );
+
+    t.true ( files1.length > 0 );
+
+    const {files: files2} = await readdir ( 'node_modules', {
+      ignoreFilesStrictly: false
+    });
+
+    t.true ( files2.length > 0 );
+
+    const {files: files3} = await readdir ( '{node_modules,dist}' );
+
+    t.true ( files3.length === 0 );
+
+    const {files: files4} = await readdir ( '{node_modules,dist}/**', { //TODO: Should the extra globstar be necessary here?
+      ignoreFilesStrictly: false
+    });
+
+    t.true ( files4.length > 0 );
+    t.true ( files4.length > files1.length );
 
   });
 

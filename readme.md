@@ -26,6 +26,7 @@ const result = await readdir ( ['src/**/*.js'], {
   ignoreFiles: ['.gitignore'], // List of .gitignore-like files to look for, defaults to ['.gitignore']
   ignoreFilesFindAbove: true, // Whether to look for .gitignore-like files in parent directories also, defaults to true
   ignoreFilesFindBetween: true, // Whether to look for .gitignore-like files between the "cwd" directory, and the actual search directories, which due to some optimizations could not be the same
+  ignoreFilesStrictly: true, // Whether to strictly follow the rules in .gitignore-like files, even if they exclude the folder you are explicitly searching into, defaults to false
   signal: aborter.signal, // Optional abort signal, useful for aborting potentially expensive operations
   onDirents: dirents => console.log ( dirents ) // Optional callback that will be called as soon as new dirents are available, useful for example for discovering ".gitignore" files while searching
 });
