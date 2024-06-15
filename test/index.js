@@ -126,4 +126,13 @@ describe ( 'Tiny Readdir Glob Gitignore', it => {
 
   });
 
+  it ( 'supports relative paths expressed in various ways', async t => {
+
+    const {files: files1} = await readdir ( '.' );
+    const {files: files2} = await readdir ( './' );
+
+    t.true ( files1.length === files2.length );
+
+  });
+
 });

@@ -102,7 +102,11 @@ const getSearchPaths = ( rootPath: string, globs: string | string[] ): string[] 
 
         if ( searchPath === rootPath ) break;
 
-        searchPath = path.dirname ( searchPath );
+        const searchPathNext = path.dirname ( searchPath );
+
+        if ( searchPathNext.length <= rootPath.length ) break;
+
+        searchPath = searchPathNext;
 
       }
 
@@ -132,7 +136,11 @@ const getSkippedPaths = ( rootPath: string, globs: string | string[] ): string[]
 
         if ( skippedPath === rootPath ) break;
 
-        skippedPath = path.dirname ( skippedPath );
+        const skippedPathNext = path.dirname ( skippedPath );
+
+        if ( skippedPathNext.length <= rootPath.length ) break;
+
+        skippedPath = skippedPathNext;
 
       }
 
