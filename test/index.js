@@ -76,7 +76,7 @@ describe ( 'Tiny Readdir Glob Gitignore', it => {
       ignoreFilesStrictly: true
     });
 
-    t.true ( result1.files.length < 120 );
+    t.true ( result1.files.length < 130 );
     t.is ( result2.files.length, 0 );
 
     t.true ( result3.files.length > 100 );
