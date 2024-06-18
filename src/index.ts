@@ -26,7 +26,7 @@ const readdirGlobGitignore = async ( glob: string | string[], options?: Options 
   const skippedPaths = getSkippedPaths ( rootPath, glob );
   const forcedPaths = ignoreFilesStrictly ? [] : searchPaths;
 
-  if ( ignoreFilesFindAbove && ignoreFiles.length ) {
+  if ( glob.length && ignoreFilesFindAbove && ignoreFiles.length ) {
     const parentPath = path.dirname ( rootPath );
     for ( const ignoreFile of ignoreFiles ) {
       const filePath = findUpPath ( ignoreFile, parentPath );
@@ -38,7 +38,7 @@ const readdirGlobGitignore = async ( glob: string | string[], options?: Options 
     }
   }
 
-  if ( ignoreFilesFindBetween && ignoreFiles.length ) {
+  if ( glob.length && ignoreFilesFindBetween && ignoreFiles.length ) {
     for ( const skippedPath of skippedPaths ) {
       const ignore = await getIgnoreAt ( skippedPath, ignoreFiles, forcedPaths );
       if ( !ignore ) continue;
