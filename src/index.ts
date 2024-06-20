@@ -5,7 +5,7 @@ import findUpPath from 'find-up-path';
 import path from 'node:path';
 import process from 'node:process';
 import readdirGlob from 'tiny-readdir-glob';
-import {castArray, getIgnoreAt, getSearchPaths, getSkippedPaths} from './utils';
+import {castArray, getIgnoreAt, getParentPaths, getSearchPaths, getSkippedPaths} from './utils';
 import type {Dirent, Ignore, Options, Result} from './types';
 
 /* MAIN */
@@ -22,9 +22,10 @@ const readdirGlobGitignore = async ( glob: string | string[], options?: Options 
   const ignores: Ignore[] = [];
 
   const rootPath = options?.cwd ?? process.cwd ();
+  const parentPaths = getParentPaths ( rootPath );
   const searchPaths = getSearchPaths ( rootPath, glob );
   const skippedPaths = getSkippedPaths ( rootPath, glob );
-  const forcedPaths = ignoreFilesStrictly ? [] : searchPaths;
+  const forcedPaths = ignoreFilesStrictly ? [] : [...parentPaths, ...searchPaths];
 
   if ( glob.length && ignoreFilesFindAbove && ignoreFiles.length ) {
     const parentPath = path.dirname ( rootPath );

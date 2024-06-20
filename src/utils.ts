@@ -84,6 +84,28 @@ const getIgnoreContentWithForcedPaths = ( folderPath: string, content: string, f
 
 };
 
+const getParentPaths = ( rootPath: string ): string[] => {
+
+  const parentPaths: string[] = [];
+
+  let parentPath = rootPath;
+
+  while ( true ) {
+
+    const parentPathNext = path.dirname ( parentPath );
+
+    if ( parentPathNext === parentPath ) break;
+
+    parentPath = parentPathNext;
+
+    parentPaths.push ( parentPath );
+
+  }
+
+  return parentPaths;
+
+};
+
 const getSearchPaths = ( rootPath: string, globs: string | string[] ): string[] => {
 
   const searchPaths = new Set<string>();
@@ -166,4 +188,4 @@ const unixify = ( filePath: string ): string => {
 
 /* EXPORT */
 
-export {castArray, fastRelativeChildPath, globExplode, getIgnoreAt, getIgnoreContentWithForcedPaths, getSearchPaths, getSkippedPaths, isString, unixify};
+export {castArray, fastRelativeChildPath, globExplode, getIgnoreAt, getIgnoreContentWithForcedPaths, getParentPaths, getSearchPaths, getSkippedPaths, isString, unixify};
