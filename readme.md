@@ -15,8 +15,9 @@ npm install --save tiny-readdir-glob-gitignore
 ```ts
 import readdir from 'tiny-readdir-glob-gitignore';
 
-const aborter = new AbortController ();
+// Let's recursively read into a directory using a glob, in a .gitignore-aware fashion
 
+const aborter = new AbortController ();
 const result = await readdir ( ['src/**/*.js'], {
   cwd: process.cwd (), // The root directory to start searching from
   depth: 20, // Maximum depth to look at
@@ -31,21 +32,25 @@ const result = await readdir ( ['src/**/*.js'], {
   onDirents: dirents => console.log ( dirents ) // Optional callback that will be called as soon as new dirents are available, useful for example for discovering ".gitignore" files while searching
 });
 
-console.log ( result.directories ); // => Array of absolute paths pointing to directories, filtered by the provided glob
-console.log ( result.files ); // => Array of absolute paths pointing to files, filtered by the provided glob
-console.log ( result.symlinks ); // => Array of absolute paths pointing to symlinks, filtered by the provided glob
+// This is the basic information we'll get
 
-console.log ( result.directoriesFound ); // => Array of absolute paths pointing to directories, not fully filtered by the provided glob yet
-console.log ( result.filesFound ); // => Array of absolute paths pointing to files, not fully filtered by the provided glob yet
-console.log ( result.symlinksFound ); // => Array of absolute paths pointing to symlinks, not fully filtered by the provided glob yet
+result.directories; // => Array of absolute paths pointing to directories, filtered by the provided glob
+result.files; // => Array of absolute paths pointing to files, filtered by the provided glob
+result.symlinks; // => Array of absolute paths pointing to symlinks, filtered by the provided glob
 
-console.log ( result.directoriesFoundNames ); // => Set of directories names found
-console.log ( result.filesFoundNames ); // => Set of files name found
-console.log ( result.symlinksFoundNames ); // => Set of symlinks names found
+// This is more advanced information we'll get, which is useful in some cases
 
-console.log ( result.directoriesFoundNamesToPaths ); // => Record of directories names found to their paths
-console.log ( result.filesFoundNamesToPaths ); // => Record of files name found to their paths
-console.log ( result.symlinksFoundNamesToPaths ); // => Record of symlinks names found to their paths
+result.directoriesFound; // => Array of absolute paths pointing to directories, not fully filtered by the provided glob yet
+result.filesFound; // => Array of absolute paths pointing to files, not fully filtered by the provided glob yet
+result.symlinksFound; // => Array of absolute paths pointing to symlinks, not fully filtered by the provided glob yet
+
+result.directoriesFoundNames; // => Set of directories names found
+result.filesFoundNames; // => Set of files name found
+result.symlinksFoundNames; // => Set of symlinks names found
+
+result.directoriesFoundNamesToPaths; // => Record of directories names found to their paths
+result.filesFoundNamesToPaths; // => Record of files name found to their paths
+result.symlinksFoundNamesToPaths; // => Record of symlinks names found to their paths
 
 setTimeout ( () => aborter.abort (), 10000 ); // Aborting if it's going to take longer than 10s
 ```
